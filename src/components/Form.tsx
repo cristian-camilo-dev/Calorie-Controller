@@ -1,22 +1,21 @@
 import { useState } from "react";
 import { categories } from "../data/categories";
 import { Activity } from "../types";
+import { ActivityActions } from "../reducers/activityReducer";
 
-/**
- * Componente de formulario para agregar actividades.
- */
-export default function Form() {
-  const [activity, setActivity] = useState<Activity>({
-    category: 1,
-    name: "",
-    calories: 0,
-  });
+type FormProps = {
+  dispatch: React.Dispatch<ActivityActions>;
+};
 
-  /**
-   * Maneja el evento de cambio para el elemento de entrada o selección.
-   *
-   * @param e - El objeto de evento de cambio.
-   */
+const initialState: Activity = {
+  category: 1,
+  name: "",
+  calories: 0,
+};
+
+export default function Form({ dispatch }: FormProps) {
+  const [activity, setActivity] = useState<Activity>(initialState);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -28,24 +27,15 @@ export default function Form() {
     });
   };
 
-  /**
-   * Verifica si la actividad es válida.
-   *
-   * @returns true si la actividad es válida, de lo contrario false.
-   */
   const isValidActivity = () => {
     const { name, calories } = activity;
     return name.trim() !== "" && calories > 0;
   };
 
-  /**
-   * Maneja el envío del formulario.
-   *
-   * @param e - El evento de formulario.
-   */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(activity);
+    dispatch({ type: "save-activity", payload: { newActivity: activity } });
+    setActivity(initialState);
   };
 
   return (
@@ -63,6 +53,7 @@ export default function Form() {
             id="category"
             className="border border-slate-300 p-2 rounded-lg w-full bg-white"
             onChange={handleChange}
+            autoComplete="off"
           >
             {categories.map((category) => (
               <option key={category.id} value={category.id}>
@@ -83,6 +74,7 @@ export default function Form() {
             placeholder="Ej. comida, cena, desayuno, pesas, correr, etc."
             value={activity.name}
             onChange={handleChange}
+            autoComplete="off"
           />
         </div>
 
@@ -97,6 +89,7 @@ export default function Form() {
             placeholder="Calorías Ej. 200, 300, 500, etc."
             value={activity.calories}
             onChange={handleChange}
+            autoComplete="off"
           />
         </div>
 
